@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import './App.css';
 import './fonts/Geometria/stylesheet.css';
 import Table, { column } from './components/Table/Table';
@@ -11,7 +12,7 @@ let columns: Array<column> = [
     {title: "№", name: "requestNumber"},
     {title: "Время получения заявки", name: "receiveTime"},
     {title: "Название фирмы", name: "companyName"},
-    {title: "ФИО", name: "fullname"},
+    {title: "ФИО", name: "fullName"},
     {title: "Контактный телефон перевозчика", name: "phoneNumber"},
     {title: "Комментарии", name: "comments"},
     {title: "ATI код сети перевозчика", name: "atiCode"},
@@ -24,7 +25,7 @@ let rows: any = [
         requestNumber: "123",
         receiveTime: "21.03.21 18:02",
         companyName: "companyName1",
-        fullname: "Иванов Иван Иванович",
+        fullName: "Иванов Иван Иванович",
         phoneNumber: "+79233438821",
         comments: "Круто",
         atiCode: "https://ati.su/firms/12345/info"
@@ -33,15 +34,24 @@ let rows: any = [
         requestNumber: "124",
         receiveTime: "24.03.21 12:32",
         companyName: "companyName2",
-        fullname: "Зубенко Михаил Петрович",
+        fullName: "Зубенко Михаил Петрович",
         phoneNumber: "+76223433821",
         comments: "Класс",
         atiCode: "https://ati.su/firms/12323/info"
     }
 ]
 
+// axios.defaults.headers.common['mode'] = 'no-cors';
+// axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+// axios.defaults.headers.common['Content-Type'] = 'application/json';
+
 
 function App() {
+  useEffect(() => {
+    axios.get('api/items')
+      .then(req => console.log(req))
+  }, [])
+
   return (
     <div className="App">
         <header className='header'></header>
