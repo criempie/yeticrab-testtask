@@ -8,7 +8,7 @@ RUN npm install --silent --save
 
 COPY ./ /app
 
-EXPOSE "5000:5000"
+EXPOSE 5001:5000
 
 CMD ["npm", "run", "start:prod"]
 
