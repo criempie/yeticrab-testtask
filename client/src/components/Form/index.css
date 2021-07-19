@@ -1,0 +1,9 @@
+.label-input-container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 200px;
+    width: max-content;
+    margin-bottom: 20px;
+}

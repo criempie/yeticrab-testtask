@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import './App.css';
 import './fonts/Geometria/stylesheet.css';
@@ -7,10 +7,14 @@ import Row from './components/Table/Row';
 import SearchLine from "./components/SearchLine/SearchLine";
 import FilterNumber from "./components/Filter/FilterNumber";
 import FilterDate from "./components/Filter/FilterDate";
+import Button from "./components/Button/Button";
+import ModalWindow from './components/ModalWindow/ModalWindow';
+import InputText from './components/Input/InputText';
+import Form from './components/Form/Form';
 
 let columns: Array<column> = [
     {title: "№", name: "requestNumber"},
-    {title: "Время получения заявки", name: "receiveTime"},
+    {title: "Время получения заявки", name: "receiveTime", parsingFunction: (date: string): string => date.split("T").join(" ")},
     {title: "Название фирмы", name: "companyName"},
     {title: "ФИО", name: "fullName"},
     {title: "Контактный телефон перевозчика", name: "phoneNumber"},
@@ -20,60 +24,163 @@ let columns: Array<column> = [
     {title: "", name: "trash", width: 37},
 ];
 
-let rows: any = [
-    {
-        requestNumber: "123",
-        receiveTime: "21.03.21 18:02",
-        companyName: "companyName1",
-        fullName: "Иванов Иван Иванович",
-        phoneNumber: "+79233438821",
-        comments: "Круто",
-        atiCode: "https://ati.su/firms/12345/info"
-    },
-    {
-        requestNumber: "124",
-        receiveTime: "24.03.21 12:32",
-        companyName: "companyName2",
-        fullName: "Зубенко Михаил Петрович",
-        phoneNumber: "+76223433821",
-        comments: "Класс",
-        atiCode: "https://ati.su/firms/12323/info"
-    }
+const inputsSettings = [
+  {
+    placeholder: "ООО Яйца",
+    name: "companyName",
+    label: "Название фирмы клиента"
+  },
+  {
+    placeholder: "Иванов Иван Иванович",
+    name: "fullName",
+    label: "ФИО перевозчика"
+  },
+  {
+    placeholder: "+79310000000",
+    name: "phoneNumber",
+    label: "Контактный телефон перевозчика"
+  },
+  {
+    placeholder: "Комментарий",
+    name: "comments",
+    label: "Комментарии"
+  },
+  {
+    placeholder: "12345",
+    name: "atiCode",
+    label: "ATI код сети перевозчика"
+  }
 ]
 
-// axios.defaults.headers.common['mode'] = 'no-cors';
-// axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-// axios.defaults.headers.common['Content-Type'] = 'application/json';
-
-
 function App() {
-  useEffect(() => {
+  const [rows, setRows] = useState([
+    {
+      "companyName": "Яица",
+      "fullName": "Иванов Иван Иванович",
+      "phoneNumber": "+79433251128",
+      "comments": "Привет",
+      "atiCode": "https://ati.su/firms/12345/info",
+      "id": 1626512494971,
+      "requestNumber": 6,
+      "receiveTime": "2021-07-17T09:01:34"
+    }
+  ]);
+
+  const [modalWindowFlag, setModalWindowFlag] = useState(false);
+  const [modalWindowEditWithId, setModalWindowEditWithId] = useState<number>(0);
+
+   useEffect(() => {
     axios.get('api/items')
-      .then(req => console.log(req))
+      .then(req => setRows(req.data))
+      .catch(e => console.log("get api/items error: ", e))
   }, [])
 
   return (
     <div className="App">
-        <header className='header'></header>
 
-        <br />
-        <br />
-        <br />
+      {modalWindowFlag &&
+        <ModalWindow onBlur={() => setModalWindowFlag(false)}>
+          <img className='icon'
+               src='./icons/cancel.svg'
+               style={{position: "absolute", right: "5%"}}
+               onClick={() => setModalWindowFlag(false)}/>
+          <h1>Создание новой заявки</h1>
+          <Form inputsSettings={inputsSettings}
+                onSubmit={() => setModalWindowFlag(false)}
+                type='post' />
+        </ModalWindow>
+      }
 
-        <div style={{paddingLeft: "3em", paddingRight: "3em"}}>
-            <div className='inline-container'>
-                <SearchLine />
-                <FilterNumber />
-                <FilterDate />
-            </div>
+      {Boolean(modalWindowEditWithId) &&
+        <ModalWindow onBlur={() => setModalWindowEditWithId(0)}>
+          <img className='icon'
+               src='./icons/cancel.svg'
+               style={{position: "absolute", right: "5%"}}
+               onClick={() => setModalWindowEditWithId(0)}/>
+          <h1>Редактирование заявки</h1>
 
-            <Table columns={columns}>
-                { rows.map((row: any) => <Row columns={columns} row={row} />) }
-            </Table>
+          <Form inputsSettings={inputsSettings}
+                onSubmit={() => setModalWindowEditWithId(0)}
+                type='patch'
+                id={modalWindowEditWithId} />
+
+        </ModalWindow>
+      }
+
+      <header className='header'>
+        <Button text="Создать новую заявку" onClick={() => setModalWindowFlag(true)} />
+      </header>
+
+      <div style={{paddingLeft: "3em", paddingRight: "3em"}}>
+        <div className='inline-container'>
+          <SearchLine />
+          <FilterNumber />
+          <FilterDate />
         </div>
 
-    </div>
+        <Table columns={columns} eventListener={tableEventListener}>
+          { rows.map((row: any) => <Row columns={columns} row={row} key={row.id} />) }
+        </Table>
+      </div>
+
+  </div>
   );
+
+  interface patchChangesInterface {
+    id : number;
+    companyName?: string;
+    fullName?: string;
+    phoneNumber?: string;
+    comments?: string;
+    atiCode?: number;
+  }
+
+  async function patchChanges(changedObject: patchChangesInterface) {
+    console.log(changedObject)
+    let request = axios.patch('/api/items', changedObject);
+    let response = await request;
+
+    return response.data;
+  }
+
+  async function modalWindowWithIdEventListener(event : React.SyntheticEvent) {
+    let element = event.target as HTMLInputElement;
+    let id = modalWindowEditWithId;
+    let requestBody = {id};
+    let asd;
+
+    if (element.className === "modal-window-container" || element.name === "cancel") {
+      requestBody = null!;
+      setModalWindowEditWithId(0);
+    } else if (element.tagName === "input" && element.value) {
+      // @ts-ignore
+      requestBody[element.name] = element.value;
+    } else if (element.name === "submit") {
+      console.log(await patchChanges(requestBody));
+
+
+    }
+
+  }
+
+  function tableEventListener(event: React.SyntheticEvent) {
+    let element = event.target as HTMLElement;
+
+    if (element.id) {
+      let [action, id] = element.id.split(";");
+      if (action === "edit") {
+        setModalWindowEditWithId(Number(id))
+      }
+
+    }
+  }
+
 }
+
+
+
+
+
+
 
 export default App;
