@@ -6,10 +6,8 @@ import {
   Patch,
   Body,
   Param,
-  Logger,
 } from '@nestjs/common';
 import { CreateItemDto, CreateItemValidation } from './dto/create-item.dto';
-import { DeleteItemDto } from './dto/delete-item.dto';
 import { PatchItemDto } from './dto/patch-item.dto';
 import { ItemsService } from './items.service';
 import { Item } from './items.interface';

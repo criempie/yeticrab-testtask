@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './App.css';
 import './fonts/Geometria/stylesheet.css';
@@ -9,7 +9,6 @@ import FilterNumber from "./components/Filter/FilterNumber";
 import FilterDate from "./components/Filter/FilterDate";
 import Button from "./components/Button/Button";
 import ModalWindow from './components/ModalWindow/ModalWindow';
-import InputText from './components/Input/InputText';
 import Form from './components/Form/Form';
 
 let columns: Array<column> = [
@@ -82,6 +81,7 @@ function App() {
         <ModalWindow onBlur={() => setModalWindowFlag(false)}>
           <img className='icon'
                src='./icons/cancel.svg'
+               alt='cancel'
                style={{position: "absolute", right: "5%"}}
                onClick={() => setModalWindowFlag(false)}/>
           <h1>Создание новой заявки</h1>
@@ -94,6 +94,7 @@ function App() {
       {Boolean(modalWindowEditWithId) &&
         <ModalWindow onBlur={() => setModalWindowEditWithId(0)}>
           <img className='icon'
+               alt='cancel'
                src='./icons/cancel.svg'
                style={{position: "absolute", right: "5%"}}
                onClick={() => setModalWindowEditWithId(0)}/>
@@ -126,44 +127,11 @@ function App() {
   </div>
   );
 
-  interface patchChangesInterface {
-    id : number;
-    companyName?: string;
-    fullName?: string;
-    phoneNumber?: string;
-    comments?: string;
-    atiCode?: number;
-  }
-
-  async function patchChanges(changedObject: patchChangesInterface) {
-    console.log(changedObject)
-    let request = axios.patch('api/items', changedObject);
-    let response = await request;
-
-    return response.data;
-  }
-
   async function deleteRequest(id: any) {
     let request = axios.delete(`api/items/${id}`)
     let response = await request;
 
     return response.data
-  }
-
-  async function modalWindowWithIdEventListener(event : React.SyntheticEvent) {
-    let element = event.target as HTMLInputElement;
-    let id = modalWindowEditWithId;
-    let requestBody = {id};
-
-    if (element.className === "modal-window-container" || element.name === "cancel") {
-      requestBody = null!;
-      setModalWindowEditWithId(0);
-    } else if (element.tagName === "input" && element.value) {
-      // @ts-ignore
-      requestBody[element.name] = element.value;
-    } else if (element.name === "submit") {
-      console.log(await patchChanges(requestBody));
-    }
   }
 
   function tableEventListener(event: React.SyntheticEvent) {
@@ -179,13 +147,6 @@ function App() {
 
     }
   }
-
 }
-
-
-
-
-
-
 
 export default App;

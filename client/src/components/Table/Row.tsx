@@ -2,8 +2,12 @@ import React from 'react';
 import './index.css';
 import { column } from "./Table";
 
-function Row({ columns, row }: { columns: Array<column>, row: any }) {
+interface RowProps {
+    columns: Array<column>;
+    row: any;
+}
 
+function Row({ columns, row }: RowProps) {
     return buildRow(row, columns)
 }
 

@@ -6,7 +6,7 @@ import { Error } from './errors.interface';
 @Injectable()
 export class ItemsService {
   private items: Array<ItemProcessed> = [];
-  private requestNumber = 1;
+  private requestNumber = 0;
 
   create(item: Item) {
     const date = new Date();

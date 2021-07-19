@@ -1,4 +1,4 @@
-import React, { useRef, createRef, useEffect, useState } from 'react';
+import React, { useRef } from 'react';
 import './index.css';
 import InputText from '../Input/InputText';
 import Button from '../Button/Button';
@@ -11,22 +11,14 @@ type InputSettings = {
   width?: number,
 }
 
-type ButtonSettings = {
-  text: string,
-  name: string,
-  style?: {[key: string]: string | number},
-  onClick: () => void,
-}
-
 interface FormProps {
   inputsSettings: Array<InputSettings>;
-  buttonsSettings?: Array<ButtonSettings>;
   id?: number;
   onSubmit: () => void;
   type: "patch" | "post";
 }
 
-function Form({ inputsSettings, buttonsSettings, id, onSubmit, type }: FormProps) {
+function Form({ inputsSettings, id, onSubmit, type }: FormProps) {
   const inputRefs = useRef([]);
   inputRefs.current = [];
 
@@ -47,7 +39,7 @@ function Form({ inputsSettings, buttonsSettings, id, onSubmit, type }: FormProps
     return objValues
   }
 
-  async function patchRequest(obj: { [p: string]: any } & { id: number | undefined }) {
+  async function patchRequest(obj: { [key: string]: any } & { id: number | undefined }) {
     axios.patch('api/items', obj)
       .then(res => console.log(res.data))
       .catch(e => console.log(e))
@@ -62,7 +54,6 @@ function Form({ inputsSettings, buttonsSettings, id, onSubmit, type }: FormProps
   return (
     <>
       {inputsSettings.map((setting: InputSettings, i) => buildInput(setting, getRef))}
-      {buttonsSettings?.map((setting: ButtonSettings) => buildButton(setting))}
       <Button text='Готово' name='submit' onClick={() => {
         if (type === "patch") {
           patchRequest(Object.assign(getValuesFromInputs(), {id}));
@@ -74,8 +65,6 @@ function Form({ inputsSettings, buttonsSettings, id, onSubmit, type }: FormProps
       }} />
     </>
   )
-
-
 }
 
 function buildInput(setting: InputSettings, ref: any) {
@@ -87,12 +76,6 @@ function buildInput(setting: InputSettings, ref: any) {
                  name={setting.name}
                  ref={ref}/>
     </div>
-  )
-}
-
-function buildButton(setting: ButtonSettings) {
-  return (
-    <Button text={setting.text} name={setting.name} style={setting.style} onClick={setting.onClick} />
   )
 }
 

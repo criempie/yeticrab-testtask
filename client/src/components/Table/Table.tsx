@@ -3,7 +3,13 @@ import './index.css';
 
 export type column = { title: string, name: string, width?: number, parsingFunction?: object };
 
-function Table({ columns, eventListener, children }:{ columns: Array<column>, eventListener: (event: React.SyntheticEvent) => void, children?: React.ReactNode[] }) {
+interface TableProps {
+  columns: Array<column>;
+  eventListener: (event: React.SyntheticEvent) => void;
+  children?: React.ReactChild[];
+}
+
+function Table({ columns, eventListener, children }: TableProps) {
 
     return (
         <table className='table' onClick={eventListener}>
