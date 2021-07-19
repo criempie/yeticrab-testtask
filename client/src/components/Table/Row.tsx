@@ -13,11 +13,15 @@ function buildRow(row: any, columns: Array<column>): React.ReactElement {
         <tr className="table-row">
             {
                 columns.map((col:column) => {
-                    if (col.name !== "edit" && col.name !== "trash") {
-                        return <th className="table-cell">{row[col.name]}</th>
-                    } else {
-                        return <th className='table-cell icon'><img src={`./icons/${col.name}.svg`}
+                    if (col.name === "edit" || col.name === "trash") {
+                        return <th className='table-cell icon'><img id={col.name + ";" + row.id}
+                                                                    src={`./icons/${col.name}.svg`}
                                                                     alt={col.name} /></th>
+                    } else if (col.hasOwnProperty("parsingFunction")) {
+                        // @ts-ignore
+                        return <th className='table-cell'>{col.parsingFunction?.(row[col.name])}</th>
+                    } else {
+                        return <th className="table-cell">{row[col.name]}</th>
                     }
                 })
             }

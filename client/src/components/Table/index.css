@@ -28,6 +28,10 @@
     padding-left: 15px;
 }
 
+.icon {
+    width: 32px;
+}
+
 .icon > img {
     width: 32px;
 }

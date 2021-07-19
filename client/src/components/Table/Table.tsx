@@ -1,12 +1,12 @@
 import React from 'react';
 import './index.css';
 
-export type column = { title: string, name: string, width?: number };
+export type column = { title: string, name: string, width?: number, parsingFunction?: object };
 
-function Table({ columns, children }:{ columns: Array<column>, children?: React.ReactNode[] }) {
+function Table({ columns, eventListener, children }:{ columns: Array<column>, eventListener: (event: React.SyntheticEvent) => void, children?: React.ReactNode[] }) {
 
     return (
-        <table className='table'>
+        <table className='table' onClick={eventListener}>
             <thead>
                 { buildTableHeader(columns) }
             </thead>
