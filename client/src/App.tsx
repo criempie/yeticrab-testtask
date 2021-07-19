@@ -71,7 +71,7 @@ function App() {
       "atiCode": "121241",
       "id": 23425235235,
       "requestNumber": 2,
-      "receiveTime": "2021-07-17T09:01:34"
+      "receiveTime": "2021-06-12T09:01:34"
     },
     {
       "companyName": "ак дела",
@@ -81,7 +81,7 @@ function App() {
       "atiCode": "121241",
       "id": 75756723254,
       "requestNumber": 3,
-      "receiveTime": "2021-07-17T09:01:34"
+      "receiveTime": "2021-08-27T09:01:34"
     }
   ]);
 
@@ -91,7 +91,7 @@ function App() {
   const [modalWindowEditWithId, setModalWindowEditWithId] = useState<number>(0);
   const [searchValue, setSearchValue] = useState<string>("");
   const [intervalRequestNumber, setIntervalRequestNumber] = useState<[number, number]>([0, Infinity]);
-
+  const [intervalDate, setIntervalDate] = useState<[string, string]>(["", ""]);
 
    useEffect(() => {
     axios.get('api/items')
@@ -141,13 +141,16 @@ function App() {
         <div className='inline-container'>
           <SearchLine onChange={value => {
             setSearchValue(value);
-            filterRows(value, intervalRequestNumber);
+            filterRows(value, intervalRequestNumber, intervalDate);
           }} />
           <FilterNumber getInterval={(from, to) => {
             setIntervalRequestNumber([from, to]);
-            filterRows(searchValue, [from, to]);
+            filterRows(searchValue, [from, to], intervalDate);
           }} />
-          <FilterDate />
+          <FilterDate getInterval={(from, to) => {
+            setIntervalDate([from, to]);
+            filterRows(searchValue, intervalRequestNumber, [from, to]);
+          }}/>
         </div>
 
         <Table columns={columns} eventListener={tableEventListener}>
@@ -179,7 +182,7 @@ function App() {
     }
   }
 
-  function filterRows(findName: string, intervalRequestNumber: [number, number]) {
+  function filterRows(findName: string, intervalRequestNumber: [number, number], intervalDate: [string, string]) {
     let newRows = rows.slice();
 
     if (findName) {
@@ -188,6 +191,17 @@ function App() {
 
     if (intervalRequestNumber[1] < Infinity && intervalRequestNumber[0] > 0) {
       newRows = newRows.filter(obj => obj.requestNumber >= intervalRequestNumber[0] && obj.requestNumber <= intervalRequestNumber[1])
+    }
+
+    if (intervalDate[0] && intervalDate[1]) {
+      let date1 = new Date(intervalDate[0]);
+      let date2 = new Date(intervalDate[1]);
+
+      newRows = newRows.filter(obj => {
+        let temp = new Date(obj.receiveTime);
+        return temp >= date1 && date2 >= temp;
+      })
+
     }
 
     setRowsFiltered(newRows);
