@@ -1,5 +1,15 @@
-import { Controller, Get, Post, Body, Logger } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Patch,
+  Body,
+  Logger,
+} from '@nestjs/common';
 import { CreateItemDto, CreateItemValidation } from './dto/create-item.dto';
+import { DeleteItemDto } from './dto/delete-item.dto';
+import { PatchItemDto } from './dto/patch-item.dto';
 import { ItemsService } from './items.service';
 import { Item } from './items.interface';
 
@@ -25,12 +35,22 @@ export class ItemsController {
   @Post()
   create(@Body() data: CreateItemDto) {
     if (!this.validation(data, CreateItemValidation))
-      return this.itemsService.error('Неверная структура');
+      return this.itemsService.error('structureError', 'Неверная структура');
     else return this.itemsService.create(data);
   }
 
   @Get()
   findAll(): Array<Item> {
     return this.itemsService.findAll();
+  }
+
+  @Delete()
+  deleteById(@Body() data: DeleteItemDto) {
+    return this.itemsService.deleteById(data.id);
+  }
+
+  @Patch()
+  patchById(@Body() data: PatchItemDto) {
+    return this.itemsService.patchItem(data);
   }
 }

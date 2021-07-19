@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Item, ItemProcessed } from './items.interface';
+import { PatchItemDto } from './dto/patch-item.dto';
 import { Error } from './errors.interface';
 
 @Injectable()
@@ -26,7 +27,40 @@ export class ItemsService {
     return this.items;
   }
 
-  error(text: string): Error {
-    return { message: text };
+  error(type: string, text: string): Error {
+    return { type: type, message: text };
+  }
+
+  deleteById(id: number): Error | { id: number } {
+    const itemIndex = this.items.findIndex(
+      (obj: ItemProcessed) => obj.id === Number(id),
+    );
+
+    if (itemIndex === -1) {
+      return {
+        type: 'deleteError',
+        message: `Элемент с id: ${id} не найден`,
+      } as Error;
+    } else {
+      this.items.splice(itemIndex, 1);
+      return { id: Number(id) };
+    }
+  }
+
+  patchItem(item: PatchItemDto): Error | ItemProcessed {
+    const itemRef = this.items.find((obj) => obj.id === Number(item.id));
+
+    if (itemRef) {
+      Object.entries(item).forEach(([propertyName, value]: [string, any]) => {
+        itemRef[propertyName] = value;
+      });
+
+      return itemRef;
+    }
+
+    return {
+      type: 'patchError',
+      message: `Элемент с id ${item.id} не найден`,
+    };
   }
 }
