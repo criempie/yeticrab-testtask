@@ -18,7 +18,7 @@ let columns: Array<column> = [
     {title: "ФИО", name: "fullName"},
     {title: "Контактный телефон перевозчика", name: "phoneNumber"},
     {title: "Комментарии", name: "comments"},
-    {title: "ATI код сети перевозчика", name: "atiCode"},
+    {title: "ATI код сети перевозчика", name: "atiCode", parsingFunction: (atiCode: number): string => `https://ati.su/firms/${atiCode}/info`},
     {title: "", name: "edit", width: 32},
     {title: "", name: "trash", width: 37},
 ];
@@ -57,16 +57,41 @@ function App() {
       "companyName": "Яица",
       "fullName": "Иванов Иван Иванович",
       "phoneNumber": "+79433251128",
-      "comments": "Привет",
-      "atiCode": "https://ati.su/firms/12345/info",
+      "comments": "Привет как дела что делашеь как погода",
+      "atiCode": "121241",
       "id": 1626512494971,
-      "requestNumber": 6,
+      "requestNumber": 1,
+      "receiveTime": "2021-07-17T09:01:34"
+    },
+    {
+      "companyName": "Пососи",
+      "fullName": "Зубенко Михаил Петрович",
+      "phoneNumber": "+79433251128",
+      "comments": "как дела",
+      "atiCode": "121241",
+      "id": 23425235235,
+      "requestNumber": 2,
+      "receiveTime": "2021-07-17T09:01:34"
+    },
+    {
+      "companyName": "ак дела",
+      "fullName": "Петров Иван Иванович",
+      "phoneNumber": "+79433251128",
+      "comments": "Привет ",
+      "atiCode": "121241",
+      "id": 75756723254,
+      "requestNumber": 3,
       "receiveTime": "2021-07-17T09:01:34"
     }
   ]);
 
+  const [rowsFiltered, setRowsFiltered] = useState(rows);
+
   const [modalWindowFlag, setModalWindowFlag] = useState(false);
   const [modalWindowEditWithId, setModalWindowEditWithId] = useState<number>(0);
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [intervalRequestNumber, setIntervalRequestNumber] = useState<[number, number]>([0, Infinity]);
+
 
    useEffect(() => {
     axios.get('api/items')
@@ -114,13 +139,19 @@ function App() {
 
       <div style={{paddingLeft: "3em", paddingRight: "3em"}}>
         <div className='inline-container'>
-          <SearchLine />
-          <FilterNumber />
+          <SearchLine onChange={value => {
+            setSearchValue(value);
+            filterRows(value, intervalRequestNumber);
+          }} />
+          <FilterNumber getInterval={(from, to) => {
+            setIntervalRequestNumber([from, to]);
+            filterRows(searchValue, [from, to]);
+          }} />
           <FilterDate />
         </div>
 
         <Table columns={columns} eventListener={tableEventListener}>
-          { rows.map((row: any) => <Row columns={columns} row={row} key={row.id} />) }
+          { rowsFiltered.map((row: any) => <Row columns={columns} row={row} key={row.id} />) }
         </Table>
       </div>
 
@@ -147,6 +178,22 @@ function App() {
 
     }
   }
+
+  function filterRows(findName: string, intervalRequestNumber: [number, number]) {
+    let newRows = rows.slice();
+
+    if (findName) {
+      newRows = (newRows.filter(obj => obj.fullName.toLowerCase().indexOf(findName.toLocaleLowerCase()) !== -1));
+    }
+
+    if (intervalRequestNumber[1] < Infinity && intervalRequestNumber[0] > 0) {
+      newRows = newRows.filter(obj => obj.requestNumber >= intervalRequestNumber[0] && obj.requestNumber <= intervalRequestNumber[1])
+    }
+
+    setRowsFiltered(newRows);
+  }
 }
+
+
 
 export default App;
