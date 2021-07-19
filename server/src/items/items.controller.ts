@@ -5,6 +5,7 @@ import {
   Delete,
   Patch,
   Body,
+  Param,
   Logger,
 } from '@nestjs/common';
 import { CreateItemDto, CreateItemValidation } from './dto/create-item.dto';
@@ -44,9 +45,9 @@ export class ItemsController {
     return this.itemsService.findAll();
   }
 
-  @Delete()
-  deleteById(@Body() data: DeleteItemDto) {
-    return this.itemsService.deleteById(data.id);
+  @Delete('/:id')
+  deleteById(@Param('id') id: any) {
+    return this.itemsService.deleteById(id);
   }
 
   @Patch()

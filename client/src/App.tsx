@@ -137,17 +137,23 @@ function App() {
 
   async function patchChanges(changedObject: patchChangesInterface) {
     console.log(changedObject)
-    let request = axios.patch('/api/items', changedObject);
+    let request = axios.patch('api/items', changedObject);
     let response = await request;
 
     return response.data;
+  }
+
+  async function deleteRequest(id: any) {
+    let request = axios.delete(`api/items/${id}`)
+    let response = await request;
+
+    return response.data
   }
 
   async function modalWindowWithIdEventListener(event : React.SyntheticEvent) {
     let element = event.target as HTMLInputElement;
     let id = modalWindowEditWithId;
     let requestBody = {id};
-    let asd;
 
     if (element.className === "modal-window-container" || element.name === "cancel") {
       requestBody = null!;
@@ -157,10 +163,7 @@ function App() {
       requestBody[element.name] = element.value;
     } else if (element.name === "submit") {
       console.log(await patchChanges(requestBody));
-
-
     }
-
   }
 
   function tableEventListener(event: React.SyntheticEvent) {
@@ -170,6 +173,8 @@ function App() {
       let [action, id] = element.id.split(";");
       if (action === "edit") {
         setModalWindowEditWithId(Number(id))
+      } else if (action === "delete") {
+        console.log(deleteRequest(id))
       }
 
     }
