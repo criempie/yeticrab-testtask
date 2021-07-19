@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Item, ItemProcessed } from './items.interface';
+import { Item, ItemProcessed, ItemPropertiesTypes } from './items.interface';
 import { PatchItemDto } from './dto/patch-item.dto';
 import { Error } from './errors.interface';
 
@@ -49,9 +49,24 @@ export class ItemsService {
 
   patchItem(item: PatchItemDto): Error | ItemProcessed {
     const itemRef = this.items.find((obj) => obj.id === Number(item.id));
+    const excludedProperties = ['id'];
 
     if (itemRef) {
       Object.entries(item).forEach(([propertyName, value]: [string, any]) => {
+        if (!(propertyName in excludedProperties))
+          switch (ItemPropertiesTypes[propertyName]) {
+            case 'number':
+              {
+                value = Number(value);
+              }
+              break;
+            case 'string':
+              {
+                value = String(value);
+              }
+              break;
+          }
+
         itemRef[propertyName] = value;
       });
 

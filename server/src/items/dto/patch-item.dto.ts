@@ -6,3 +6,8 @@ export class PatchItemDto {
   comments?: string;
   atiCode?: number;
 }
+
+export const ItemPropertiesRequired = {
+  required: ['id'],
+  optional: ['companyName', 'fullName', 'phoneNumber', 'comments', 'atiCode'],
+};

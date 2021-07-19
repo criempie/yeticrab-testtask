@@ -8,7 +8,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { CreateItemDto, CreateItemValidation } from './dto/create-item.dto';
-import { PatchItemDto } from './dto/patch-item.dto';
+import { PatchItemDto, ItemPropertiesRequired } from './dto/patch-item.dto';
 import { ItemsService } from './items.service';
 import { Item } from './items.interface';
 
@@ -20,20 +20,42 @@ export class ItemsController {
     this.itemsService = new ItemsService();
   }
 
-  private validation(obj1, obj2): boolean {
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
+  private static comparasion(obj1, obj2): boolean {
+    const keys1 = Object.keys(obj1).sort();
+    const keys2 = Object.keys(obj2).sort();
 
     if (keys1.length === keys2.length) {
-      return keys1.every((key) => obj2.hasOwnProperty(key));
+      for (let i = 0; i < keys1.length; i++) {
+        if (keys1[i] !== keys2[i]) return false;
+      }
     }
 
-    return false;
+    return true;
+  }
+
+  private static validatePatchBody(body): boolean {
+    const required = ItemPropertiesRequired.required;
+    const optional = ItemPropertiesRequired.optional;
+    for (let i = 0; i < required.length; i++) {
+      if (!body.hasOwnProperty(required[i])) return false;
+    }
+
+    const test1 = required.some((prop) => body.hasOwnProperty(prop));
+    if (!test1) return false;
+
+    if (
+      Object.keys(body).filter(
+        (prop) => !required.includes(prop) && !optional.includes(prop),
+      ).length !== 0
+    )
+      return false;
+
+    return true;
   }
 
   @Post()
   create(@Body() data: CreateItemDto) {
-    if (!this.validation(data, CreateItemValidation))
+    if (!ItemsController.comparasion(data, CreateItemValidation))
       return this.itemsService.error('structureError', 'Неверная структура');
     else return this.itemsService.create(data);
   }
@@ -45,11 +67,13 @@ export class ItemsController {
 
   @Delete('/:id')
   deleteById(@Param('id') id: any) {
-    return this.itemsService.deleteById(id);
+    return this.itemsService.deleteById(Number(id));
   }
 
   @Patch()
   patchById(@Body() data: PatchItemDto) {
+    if (!ItemsController.validatePatchBody(data))
+      return this.itemsService.error('structureError', 'Неверная структура');
     return this.itemsService.patchItem(data);
   }
 }
