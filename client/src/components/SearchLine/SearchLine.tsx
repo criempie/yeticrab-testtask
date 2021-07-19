@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './index.css';
 
-function SearchLine() {
+interface SearchLineProps {
+	onChange: (value: string) => void;
+}
+
+function SearchLine({ onChange }: SearchLineProps) {
+	let timer =  setTimeout(() => {}, 0);
 
 	return (
 		<input className='searchLine'
-			   type='text'
-			   placeholder='Поиск по имени' />
+				   type='text'
+		       onChange={e => {
+			       clearTimeout(timer);
+			       timer = setTimeout(() => onChange(e.target.value.trim()), 100)
+		       }}
+				   placeholder='Поиск по имени' />
 	)
 }
 

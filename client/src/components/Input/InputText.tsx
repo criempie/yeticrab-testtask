@@ -5,16 +5,19 @@ interface InputTextProps {
   placeholder?: string;
   name?: string;
   style?: {[key: string]: string | number};
+  onChange?: (value: string) => void;
+  type?: "number";
 }
 
-const InputText = React.forwardRef(function({ placeholder, name, style }: InputTextProps, ref: React.Ref<any>) {
+const InputText = React.forwardRef(function({ placeholder, name, style, onChange, type }: InputTextProps, ref: React.Ref<any>) {
 
   return (
-    <input type='text'
+    <input type={type}
            placeholder={placeholder}
            className='input'
            name={name}
            style={style}
+           onChange={(event) => onChange?.(event.target.value.trim())}
            ref={ref} />
   )
 })
