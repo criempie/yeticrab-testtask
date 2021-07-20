@@ -39,6 +39,7 @@ $ sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docke
 $ docker-compose version 1.26.0, build 8a1c60f6
 ```
 ## Запускаем решение
+* Проект будет работать по адресу: http://localhost
 * Заходим в корневую папку проекта:  
 ```
 $ cd yeticrab-testtask
@@ -56,7 +57,6 @@ $ docker-compose up
 * Для того, чтобы остановить работу проекта необходимо: либо приостановить выполнение сочетанием клавиш `ctrl + c` или `ctrl + z`, а после написать `docker-compose down`, либо написать это в другом окне терминала, но для этого необходимо выполнять команду из места от куда вы запустили контейнеры.
 
 # API   
-
 ## Get request  
 #### URL: `/api/items`  
 #### METHOD: `GET`  
