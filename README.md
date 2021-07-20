@@ -114,3 +114,6 @@ $ docker-compose up
 #### URL Parameters: `:id` - id заявки
 #### METHOD: `DELETE`
 
+# Время работы
+![image](https://user-images.githubusercontent.com/56305535/126306550-df4edc7b-e2f0-49c3-a65b-b339e9571179.png)
+![image](https://user-images.githubusercontent.com/56305535/126306589-bce9d3fe-4f9b-4c38-9881-021228bd7761.png)
