@@ -20,14 +20,16 @@ export class ItemsController {
     this.itemsService = new ItemsService();
   }
 
-  private static comparasion(obj1, obj2): boolean {
+  private static comparison(obj1, obj2): boolean {
     const keys1 = Object.keys(obj1).sort();
     const keys2 = Object.keys(obj2).sort();
 
     if (keys1.length === keys2.length) {
-      for (let i = 0; i < keys1.length; i++) {
-        if (keys1[i] !== keys2[i]) return false;
+      for (const key in obj2) {
+        if (!obj1.hasOwnProperty(key)) return false;
       }
+    } else {
+      return false;
     }
 
     return true;
@@ -55,7 +57,7 @@ export class ItemsController {
 
   @Post()
   create(@Body() data: CreateItemDto) {
-    if (!ItemsController.comparasion(data, CreateItemValidation))
+    if (!ItemsController.comparison(data, CreateItemValidation))
       return this.itemsService.error('structureError', 'Неверная структура');
     else return this.itemsService.create(data);
   }

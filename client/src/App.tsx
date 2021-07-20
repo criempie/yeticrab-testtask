@@ -52,38 +52,7 @@ const inputsSettings = [
 ]
 
 function App() {
-  const [rows, setRows] = useState([
-    {
-      "companyName": "Яица",
-      "fullName": "Иванов Иван Иванович",
-      "phoneNumber": "+79433251128",
-      "comments": "Привет как дела что делашеь как погода",
-      "atiCode": "121241",
-      "id": 1626512494971,
-      "requestNumber": 1,
-      "receiveTime": "2021-07-17T09:01:34"
-    },
-    {
-      "companyName": "Пососи",
-      "fullName": "Зубенко Михаил Петрович",
-      "phoneNumber": "+79433251128",
-      "comments": "как дела",
-      "atiCode": "121241",
-      "id": 23425235235,
-      "requestNumber": 2,
-      "receiveTime": "2021-06-12T09:01:34"
-    },
-    {
-      "companyName": "ак дела",
-      "fullName": "Петров Иван Иванович",
-      "phoneNumber": "+79433251128",
-      "comments": "Привет ",
-      "atiCode": "121241",
-      "id": 75756723254,
-      "requestNumber": 3,
-      "receiveTime": "2021-08-27T09:01:34"
-    }
-  ]);
+  const [rows, setRows] = useState([]);
 
   const [rowsFiltered, setRowsFiltered] = useState(rows);
 
@@ -95,7 +64,10 @@ function App() {
 
    useEffect(() => {
     axios.get('api/items')
-      .then(req => setRows(req.data))
+      .then(req => {
+        setRows(req.data);
+        setRowsFiltered(req.data);
+      })
       .catch(e => console.log("get api/items error: ", e))
   }, [])
 
@@ -175,7 +147,7 @@ function App() {
       let [action, id] = element.id.split(";");
       if (action === "edit") {
         setModalWindowEditWithId(Number(id))
-      } else if (action === "delete") {
+      } else if (action === "trash") {
         console.log(deleteRequest(id))
       }
 
@@ -186,10 +158,12 @@ function App() {
     let newRows = rows.slice();
 
     if (findName) {
+      // @ts-ignore
       newRows = (newRows.filter(obj => obj.fullName.toLowerCase().indexOf(findName.toLocaleLowerCase()) !== -1));
     }
 
     if (intervalRequestNumber[1] < Infinity && intervalRequestNumber[0] > 0) {
+      // @ts-ignore
       newRows = newRows.filter(obj => obj.requestNumber >= intervalRequestNumber[0] && obj.requestNumber <= intervalRequestNumber[1])
     }
 
@@ -198,6 +172,7 @@ function App() {
       let date2 = new Date(intervalDate[1]);
 
       newRows = newRows.filter(obj => {
+        // @ts-ignore
         let temp = new Date(obj.receiveTime);
         return temp >= date1 && date2 >= temp;
       })
