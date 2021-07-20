@@ -18,7 +18,7 @@ let columns: Array<column> = [
     {title: "ФИО", name: "fullName"},
     {title: "Контактный телефон перевозчика", name: "phoneNumber"},
     {title: "Комментарии", name: "comments"},
-    {title: "ATI код сети перевозчика", name: "atiCode", parsingFunction: (atiCode: number): string => `https://ati.su/firms/${atiCode}/info`},
+    {title: "ATI код сети перевозчика", name: "atiCode", parsingFunction: (atiCode: number): any => <a href={`https://ati.su/firms/${atiCode}/info`}>{`https://ati.su/firms/${atiCode}/info`}</a>},
     {title: "", name: "edit", width: 32},
     {title: "", name: "trash", width: 37},
 ];
@@ -52,7 +52,18 @@ const inputsSettings = [
 ]
 
 function App() {
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState([
+    {
+      "companyName": "ИП Яйца",
+      "fullName": "Зубенко",
+      "phoneNumber": "+7901234587",
+      "comments": "Комментарий",
+      "atiCode": 123,
+      "id": 1626775405606,
+      "requestNumber": 1,
+      "receiveTime": "2021-07-20T10:03:25"
+    }
+  ]);
 
   const [rowsFiltered, setRowsFiltered] = useState(rows);
 
